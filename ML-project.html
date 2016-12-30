@@ -129,18 +129,11 @@ $(document).ready(function () {
 </div>
 <div id="data-exploratory-section" class="section level2">
 <h2>Data Exploratory Section</h2>
-<pre class="r"><code>library(caret); library(randomForest);</code></pre>
+<pre class="r"><code>library(caret);</code></pre>
 <pre><code>## Warning: package 'caret' was built under R version 3.3.2</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
 <pre><code>## Loading required package: ggplot2</code></pre>
 <pre><code>## Warning: package 'ggplot2' was built under R version 3.3.2</code></pre>
-<pre><code>## randomForest 4.6-12</code></pre>
-<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
-<pre><code>## 
-## Attaching package: 'randomForest'</code></pre>
-<pre><code>## The following object is masked from 'package:ggplot2':
-## 
-##     margin</code></pre>
 <pre class="r"><code>mytmpdir = tempdir()
 tempTrain &lt;- tempfile(tmpdir = mytmpdir)
 download.file(&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv&quot;, tempTrain)
@@ -415,8 +408,16 @@ if (!file.exists(model)) {
 <h2>Accuracy and Sample Error of Model</h2>
 <div id="training" class="section level3">
 <h3>Training</h3>
-<pre class="r"><code>pred0 &lt;- predict(fitRF, training)
-confusionMatrix(pred0, training$classe)</code></pre>
+<pre class="r"><code>pred0 &lt;- predict(fitRF, training)</code></pre>
+<pre><code>## Loading required package: randomForest</code></pre>
+<pre><code>## randomForest 4.6-12</code></pre>
+<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>## 
+## Attaching package: 'randomForest'</code></pre>
+<pre><code>## The following object is masked from 'package:ggplot2':
+## 
+##     margin</code></pre>
+<pre class="r"><code>confusionMatrix(pred0, training$classe)</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference

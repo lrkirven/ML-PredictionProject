@@ -17,7 +17,7 @@ Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible t
 ## Data Exploratory Section
 
 ```{r}
-library(caret); library(randomForest);
+library(caret);
 mytmpdir = tempdir()
 tempTrain <- tempfile(tmpdir = mytmpdir)
 download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", tempTrain)
