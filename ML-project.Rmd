@@ -1,0 +1,111 @@
+---
+title: "Machine Learning Final Project"
+author: "Lazar Kirven"
+date: "December 29, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. This project will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants and predict the manner in which they did the exercise.
+
+
+## Data Exploratory Section
+
+```{r}
+library(caret); library(randomForest);
+mytmpdir = tempdir()
+tempTrain <- tempfile(tmpdir = mytmpdir)
+download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", tempTrain)
+rawTrainData <- read.csv(tempTrain, header = TRUE, sep = ",", na.strings = c("NA", ""))
+
+tempTest <- tempfile(tmpdir = mytmpdir)
+download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", tempTest)
+rawTestData <- read.csv(tempTest, header = TRUE, sep = ",", na.strings = c("NA", ""))
+unlink(mytmpdir)
+```
+
+
+## Data Cleaning
+
+Below is some code that removes any column that just contains NAs:
+
+```{r]}
+badColumns <- c("X", "user_name", "raw_timestamp_part_1", "raw_timestamp_part_2", "cvtd_timestamp", "new_window", "num_window")
+cleanTrainData <- rawTrainData[, colSums(is.na(rawTrainData)) == 0]
+# bad columns
+cleanTrainData <- cleanTrainData[, -c(1:7)]
+str(cleanTrainData)
+cleanTestData <- rawTestData[, colSums(is.na(rawTestData)) == 0]
+# bad columns
+cleanTestData <- cleanTestData[, -c(1:7)]
+str(cleanTestData)
+```
+
+## Data Slicing
+
+Below is some code that splits the training data into training/validation datasets:
+
+```{r}
+library(caret);
+set.seed(1234) 
+inTrain <- createDataPartition(y = cleanTrainData$classe, p = 0.7, list = FALSE)
+training <- cleanTrainData[inTrain,]
+str(training)
+validation <- cleanTrainData[-inTrain, ]
+str(validation)
+```
+
+## Prediction Model Definition (Using Random Forest)
+
+```{r}
+library(doParallel)
+model <- "fitRF.RData"
+if (!file.exists(model)) {
+    require(parallel)
+    require(doParallel)
+    cluster <- makeCluster(detectCores() - 1)
+    registerDoParallel(cluster)
+    control <- trainControl(method = "cv", number = 5)
+    fitRF <- train(classe ~ ., data = training, method="rf", trControl = control)
+    save(fitRF, file = "fitRF.RData")
+    stopCluster(cluster)
+} else { 
+    load(file = "fitRF.RData")
+}
+```
+
+## Accuracy and Sample Error of Model
+
+### Training
+```{r}
+pred0 <- predict(fitRF, training)
+confusionMatrix(pred0, training$classe)
+```
+
+### Validation
+```{r}
+pred1 <- predict(fitRF, validation)
+confusionMatrix(pred1, validation$classe)
+```
+Based upon the results from the validation, the accuracy of the model is very high at .9947.
+
+### Final Model
+```{r}
+fitRF$finalModel
+```
+
+## Use model on test data
+```{r}
+predTest <- predict(fitRF, cleanTestData)
+predTest
+```
+
+## Conclusion
+
+The model predicted the final 20 test cases quiz with 100% accuracy.
+
